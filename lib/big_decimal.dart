@@ -1,0 +1,220 @@
+import 'dart:math';
+import 'package:decimal/decimal.dart';
+import 'package:decimal/intl.dart';
+import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
+
+class BigDecimal extends Equatable {
+  static const defaultPrecision = 0;
+
+  /// Create a new [BigDecimal] from a [value] of type [BigInt] given a
+  /// [precision].
+  ///
+  /// [defaultPrecision] is 0.
+  ///
+  /// Only positive [value]s are supported.
+  ///
+  /// [precision] must be positive.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(BigDecimal.fromBigInt(BigInt.from(12345))); // 12345
+  /// print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 1)); // 1234.5
+  /// print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 4)); // 1.2345
+  /// print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 8)); // 0.00012345
+  /// print(BigDecimal.fromBigInt(BigInt.from(0), precision: 8)); // 0.00000000
+  /// ```
+  factory BigDecimal.fromBigInt(
+    BigInt value, {
+    int precision = defaultPrecision,
+  }) {
+    if (value < BigInt.zero) {
+      throw Exception('Only positive values are supported');
+    }
+    if (precision < 0) throw Exception('Precision must be positive');
+    final v = Decimal.fromBigInt(value);
+    final p = Decimal.fromBigInt(BigInt.from(pow(10, precision)));
+    final r = (v / p).toDecimal().toString().split('.');
+
+    return BigDecimal._(
+      r.isNotEmpty ? r.first.split('').map(int.parse).toList() : const [],
+      r.length > 1 ? r.last.split('').map(int.parse).toList() : null,
+      precision,
+    );
+  }
+
+  /// Parses [value] as a BigDecimal literal and returns it's value as
+  /// [BigDecimal] given a [precision].
+  ///
+  /// [defaultPrecision] is 0.
+  ///
+  /// Only positive [value]s are supported.
+  ///
+  /// [precision] must be positive.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(BigDecimal.parse('12345')); // 12345
+  /// print(BigDecimal.parse('12345', precision: 2)); // 12345.00
+  /// print(BigDecimal.parse('123.45')); // 123
+  /// print(BigDecimal.parse('123.67')); // 124
+  /// print(BigDecimal.parse('123.45', precision: 4)); // 123.4500
+  /// print(BigDecimal.parse('0', precision: 8)); // 0.00000000
+  /// print(BigDecimal.parse('0.00000001', precision: 9)); // 0.000000010
+  /// ```
+  static BigDecimal parse(
+    String value, {
+    int precision = defaultPrecision,
+  }) {
+    if (precision < 0) throw Exception('Precision must be positive');
+    return BigDecimal.fromBigInt(
+      BigInt.parse(
+        Decimal.parse(value).toStringAsFixed(precision).replaceAll('.', ''),
+      ),
+      precision: precision,
+    );
+  }
+
+  factory BigDecimal.fromDouble(
+    double value, {
+    int? precision,
+  }) {
+    return parse(
+      value.toString(),
+      precision: precision ?? Decimal.parse(value.toString()).precision,
+    );
+  }
+
+  const BigDecimal.zero({
+    int precision = defaultPrecision,
+  }) : this._(const [], null, precision);
+
+  const BigDecimal._(
+    this._abs,
+    this._dec,
+    this.precision,
+  );
+
+  /// must be a valid `int` value. it is list of integers
+  final List<int> _abs;
+
+  /// must be a valid `int` value
+  final List<int>? _dec;
+
+  /// represents decimal place
+  final int precision;
+
+  bool get isZero => _abs.isEmpty && _dec == null;
+  bool get isNotZero => !isZero;
+  bool get isDecimal => _dec != null;
+  bool get isNotDecimal => !isDecimal;
+  bool get isFinite => _dec != null && _dec!.length < precision;
+
+  BigDecimal operator -(BigDecimal other) {
+    return BigDecimal.parse(
+      (toDecimal() - other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  BigDecimal operator +(BigDecimal other) {
+    return BigDecimal.parse(
+      (toDecimal() + other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  BigDecimal operator *(BigDecimal other) {
+    return BigDecimal.parse(
+      (toDecimal() * other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  BigDecimal operator /(BigDecimal other) {
+    return BigDecimal.fromDouble(
+      toDecimal().toDouble() / other.toDecimal().toDouble(),
+      precision: precision,
+    );
+  }
+
+  BigDecimal clear() => BigDecimal.zero(precision: precision);
+
+  BigDecimal remove() {
+    if (_abs.isEmpty) return _copyWith();
+    if (!isDecimal) return _copyWith(abs: List.from(_abs)..removeLast());
+    if (_dec!.isEmpty) return BigDecimal._(_abs, null, precision);
+
+    return _copyWith(dec: List.from(_dec!)..removeLast());
+  }
+
+  BigDecimal add(int? n) {
+    if (n == null) return _addPrecision();
+    if (isDecimal) return _addDec(n);
+    return _addAbs(n);
+  }
+
+  BigDecimal _addPrecision() {
+    if (isDecimal) return _copyWith();
+    return _copyWith(
+      abs: _abs.isEmpty ? [0] : _abs,
+      dec: const [],
+    );
+  }
+
+  BigDecimal _addAbs(int n) {
+    final updated = [..._abs, n];
+    if (int.tryParse(updated.join('')) == null) return _copyWith();
+    if (_abs.isEmpty && n < 1) return _copyWith();
+    return _copyWith(abs: [..._abs, n]);
+  }
+
+  BigDecimal _addDec(int n) {
+    if (isNotDecimal) return _copyWith(dec: [n]);
+    if (_dec!.length < precision) return _copyWith(dec: [..._dec!, n]);
+    return _copyWith();
+  }
+
+  BigInt toBigInt() {
+    return BigInt.tryParse(toString().replaceAll('.', '')) ?? BigInt.zero;
+  }
+
+  Decimal toDecimal() {
+    return Decimal.parse(toString());
+  }
+
+  @override
+  String toString() {
+    final abs = _abs.isNotEmpty ? _abs.join('') : '0';
+    final dec = _dec?.join('') ?? '0';
+    final str = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
+
+    return (Decimal.tryParse(str) ?? Decimal.zero).toStringAsFixed(precision);
+  }
+
+  String format({String locale = 'en_US'}) {
+    if (_abs.isEmpty) return '';
+
+    final f = NumberFormat('###,###', locale);
+    final a = f.format(
+      DecimalIntl(Decimal.tryParse(_abs.join('')) ?? Decimal.zero),
+    );
+
+    if (isNotDecimal) return a;
+    return [a, _dec?.join('')].join('.');
+  }
+
+  BigDecimal _copyWith({
+    List<int>? abs,
+    List<int>? dec,
+  }) {
+    return BigDecimal._(
+      abs ?? _abs,
+      dec ?? _dec,
+      precision,
+    );
+  }
+
+  @override
+  List<Object?> get props => [_abs, _dec];
+}
