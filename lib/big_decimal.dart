@@ -29,9 +29,9 @@ class BigDecimal extends Equatable {
     int precision = defaultPrecision,
   }) {
     if (value < BigInt.zero) {
-      throw Exception('Only positive values are supported');
+      throw FormatException('Only positive values are supported');
     }
-    if (precision < 0) throw Exception('Precision must be positive');
+    if (precision < 0) throw FormatException('Precision must be positive');
     final v = Decimal.fromBigInt(value);
     final p = Decimal.fromBigInt(BigInt.from(pow(10, precision)));
     final r = (v / p).toDecimal().toString().split('.');
@@ -66,7 +66,7 @@ class BigDecimal extends Equatable {
     String value, {
     int precision = defaultPrecision,
   }) {
-    if (precision < 0) throw Exception('Precision must be positive');
+    if (precision < 0) throw FormatException('Precision must be positive');
     return BigDecimal.fromBigInt(
       BigInt.parse(
         Decimal.parse(value).toStringAsFixed(precision).replaceAll('.', ''),
@@ -189,7 +189,8 @@ class BigDecimal extends Equatable {
     final dec = _dec?.join('') ?? '0';
     final str = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
 
-    return (Decimal.tryParse(str) ?? Decimal.zero).toStringAsFixed(precision);
+    return (Decimal.tryParse(str) ?? Decimal.zero)
+        .toStringAsFixed(max(precision, defaultPrecision));
   }
 
   String format({String locale = 'en_US'}) {
