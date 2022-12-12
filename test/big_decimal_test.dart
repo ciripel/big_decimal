@@ -26,5 +26,17 @@ void main() {
       expect(BigDecimal.parse('0', precision: 8).toString(), '0.00000000');
       expect(BigDecimal.parse('0.001', precision: 4).toString(), '0.0010');
     });
+
+    test('fromDouble', () {
+      expect(BigDecimal.fromDouble(12345).toString(), '12345');
+      expect(BigDecimal.fromDouble(123.45).toString(), '123.45');
+      expect(BigDecimal.fromDouble(123.4500).toString(), '123.45');
+      expect(BigDecimal.fromDouble(0).toString(), '0');
+      expect(BigDecimal.fromDouble(0, precision: 8).toString(), '0.00000000');
+      expect(
+          BigDecimal.fromDouble(123.450, precision: 5).toString(), '123.45000');
+      expect(
+          BigDecimal.fromDouble(123.45678, precision: 2).toString(), '123.46');
+    });
   });
 }

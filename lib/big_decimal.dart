@@ -75,13 +75,35 @@ class BigDecimal extends Equatable {
     );
   }
 
+  /// Create a new [BigDecimal] from a [value] of type [double] given a
+  /// [precision].
+  ///
+  /// [defaultPrecision] is the number of decimals of the [value].
+  ///
+  /// Only positive [value]s are supported.
+  ///
+  /// [precision] must be positive.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(BigDecimal.fromDouble(12345)); // 12345
+  /// print(BigDecimal.fromDouble(123.45)); // 123.45
+  /// print(BigDecimal.fromDouble(123.4500)); // 123.45
+  /// print(BigDecimal.fromDouble(0)); // 0
+  /// print(BigDecimal.fromDouble(0, precision: 8)); // 0.00000000
+  /// print(BigDecimal.fromDouble(123.45, precision: 5)); // 123.45000
+  /// ```
   factory BigDecimal.fromDouble(
     double value, {
     int? precision,
   }) {
+    final inheritedPrecision = (Decimal.parse(value.toString()) -
+                Decimal.parse(value.truncate().toString()))
+            .precision -
+        1;
     return parse(
       value.toString(),
-      precision: precision ?? Decimal.parse(value.toString()).precision,
+      precision: precision ?? inheritedPrecision,
     );
   }
 

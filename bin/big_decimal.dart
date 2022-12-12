@@ -1,4 +1,5 @@
 import 'package:big_decimal/big_decimal.dart';
+import 'package:decimal/decimal.dart';
 
 void main(List<String> arguments) {
   print(BigDecimal.fromBigInt(BigInt.from(12345))); // 12345
@@ -34,4 +35,23 @@ void main(List<String> arguments) {
   } catch (e) {
     print(e);
   }
+  print('==================================================');
+  print(BigDecimal.fromDouble(12345)); // 12345
+  print(BigDecimal.fromDouble(123.45)); // 123.45
+  print(BigDecimal.fromDouble(123.4500)); // 123.45
+  print(BigDecimal.fromDouble(0)); // 0
+  print(BigDecimal.fromDouble(0, precision: 8)); // 0.00000000
+  print(BigDecimal.fromDouble(123.450, precision: 5)); // 123.45000
+  print(BigDecimal.fromDouble(123.45678, precision: 2)); // 123.46
+  try {
+    print(BigDecimal.fromDouble(-123.45));
+  } catch (e) {
+    print(e);
+  }
+  try {
+    print(BigDecimal.fromDouble(123.45, precision: -1));
+  } catch (e) {
+    print(e);
+  }
+  print('==================================================');
 }
