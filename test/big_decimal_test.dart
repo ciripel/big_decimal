@@ -38,5 +38,11 @@ void main() {
       expect(
           BigDecimal.fromDouble(123.45678, precision: 2).toString(), '123.46');
     });
+
+    test('zero', () {
+      expect(BigDecimal.zero().toString(), '0');
+      expect(BigDecimal.zero(precision: 8).toString(), '0.00000000');
+      expect(BigDecimal.zero(precision: -1).toString(), '0');
+    });
   });
 }

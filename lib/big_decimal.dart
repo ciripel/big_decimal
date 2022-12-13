@@ -107,6 +107,18 @@ class BigDecimal extends Equatable {
     );
   }
 
+  /// The [BigDecimal] corresponding to `0`.
+  ///
+  /// [defaultPrecision] is 0.
+  ///
+  /// Negative [precision] will default to `0`.
+  ///
+  /// Example:
+  /// ```dart
+  /// print(BigDecimal.zero()); // 0
+  /// print(BigDecimal.zero(precision: 8)); // 0.00000000
+  /// print(BigDecimal.zero(precision: -1)); // 0
+  /// ```
   const BigDecimal.zero({
     int precision = defaultPrecision,
   }) : this._(const [], null, precision);
@@ -126,11 +138,13 @@ class BigDecimal extends Equatable {
   /// represents decimal place
   final int precision;
 
-  bool get isZero => _abs.isEmpty && _dec == null;
+  bool get isZero =>
+      (_abs.isEmpty || (_abs[0] == 0 && _abs.length == 1)) && _dec == null;
   bool get isNotZero => !isZero;
   bool get isDecimal => _dec != null;
   bool get isNotDecimal => !isDecimal;
-  bool get isFinite => _dec != null && _dec!.length < precision;
+  bool get isFinite =>
+      _dec == null || (_dec != null && _dec!.length <= precision);
 
   BigDecimal operator -(BigDecimal other) {
     return BigDecimal.parse(

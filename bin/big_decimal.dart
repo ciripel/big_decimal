@@ -54,4 +54,8 @@ void main(List<String> arguments) {
     print(e);
   }
   print('==================================================');
+  print(BigDecimal.zero()); // 0
+  print(BigDecimal.zero(precision: 8)); // 0.00000000
+  print(BigDecimal.zero(precision: -1)); // 0
+  print('==================================================');
 }
