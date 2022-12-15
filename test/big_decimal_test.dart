@@ -2,7 +2,7 @@ import 'package:big_decimal/big_decimal.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('BigDecimal parser tests - ', () {
+  group('BigDecimal parser tests -', () {
     test('fromBigInt', () {
       expect(BigDecimal.fromBigInt(BigInt.from(12345)).toString(), '12345');
       expect(BigDecimal.fromBigInt(BigInt.from(12345), precision: 1).toString(),
@@ -38,11 +38,55 @@ void main() {
       expect(
           BigDecimal.fromDouble(123.45678, precision: 2).toString(), '123.46');
     });
+  });
 
-    test('zero', () {
-      expect(BigDecimal.zero().toString(), '0');
-      expect(BigDecimal.zero(precision: 8).toString(), '0.00000000');
-      expect(BigDecimal.zero(precision: -1).toString(), '0');
+  test('zero', () {
+    expect(BigDecimal.zero().toString(), '0');
+    expect(BigDecimal.zero(precision: 8).toString(), '0.00000000');
+    expect(BigDecimal.zero(precision: -1).toString(), '0');
+  });
+
+  group('BigDecimal operators tests -', () {
+    test('addition (+)', () {
+      expect(
+        (BigDecimal.parse('1.222', precision: 3) +
+                BigDecimal.parse('1.888', precision: 4))
+            .toString(),
+        '3.11',
+      );
+      expect(
+        (BigDecimal.parse('1.6', precision: 1) +
+                BigDecimal.parse('1.005', precision: 3))
+            .toString(),
+        '2.605',
+      );
+      expect(
+        (BigDecimal.parse('0.0001', precision: 4) +
+                BigDecimal.parse('9.9999', precision: 4))
+            .toString(),
+        '10',
+      );
+    });
+
+    test('subtraction (-)', () {
+      expect(
+        (BigDecimal.parse('1.222', precision: 3) -
+                BigDecimal.parse('1.888', precision: 4))
+            .toString(),
+        '0',
+      );
+      expect(
+        (BigDecimal.parse('1.6', precision: 1) -
+                BigDecimal.parse('1.005', precision: 3))
+            .toString(),
+        '0.595',
+      );
+      expect(
+        (BigDecimal.parse('9.9999', precision: 4) -
+                BigDecimal.parse('0.9899', precision: 4))
+            .toString(),
+        '9.01',
+      );
     });
   });
 }

@@ -146,27 +146,66 @@ class BigDecimal extends Equatable {
   bool get isFinite =>
       _dec == null || (_dec != null && _dec!.length <= precision);
 
-  BigDecimal operator -(BigDecimal other) {
-    return BigDecimal.parse(
-      (toDecimal() - other.toDecimal()).toString(),
-      precision: precision,
-    );
-  }
-
+  /// Addition operator.
+  ///
+  /// Precision of the result will be minimum needed precision
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final addition = x + z; // 3.11 (precision: 2)
+  /// ```
   BigDecimal operator +(BigDecimal other) {
+    final inheritedPrecision = (Decimal.parse(
+                    (toDecimal() + other.toDecimal()).toString()) -
+                Decimal.parse(
+                    (toDecimal() + other.toDecimal()).truncate().toString()))
+            .precision -
+        1;
     return BigDecimal.parse(
       (toDecimal() + other.toDecimal()).toString(),
-      precision: precision,
+      precision: inheritedPrecision,
     );
   }
 
+  /// Subtraction operator.
+  ///
+  /// It will return [BigDecimal.zero()] if the subtraction result is negative.
+  ///
+  /// Precision of the result will be minimum needed precision
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final subtract = x - y; // 0.9995 (precision 4)
+  /// ```
+  BigDecimal operator -(BigDecimal other) {
+    final inheritedPrecision = (Decimal.parse(
+                    (toDecimal() - other.toDecimal()).toString()) -
+                Decimal.parse(
+                    (toDecimal() - other.toDecimal()).truncate().toString()))
+            .precision -
+        1;
+    if (toDecimal() - other.toDecimal() < Decimal.zero) {
+      return BigDecimal.zero(precision: defaultPrecision);
+    }
+    return BigDecimal.parse(
+      (toDecimal() - other.toDecimal()).toString(),
+      precision: inheritedPrecision,
+    );
+  }
+
+  /// Multiplication operator.
   BigDecimal operator *(BigDecimal other) {
     return BigDecimal.parse(
       (toDecimal() * other.toDecimal()).toString(),
-      precision: precision,
+      precision: max(precision, other.precision),
     );
   }
 
+  /// Division operator.
   BigDecimal operator /(BigDecimal other) {
     return BigDecimal.fromDouble(
       toDecimal().toDouble() / other.toDecimal().toDouble(),
@@ -176,7 +215,7 @@ class BigDecimal extends Equatable {
 
   BigDecimal clear() => BigDecimal.zero(precision: precision);
 
-  BigDecimal remove() {
+  BigDecimal removeValue() {
     if (_abs.isEmpty) return _copyWith();
     if (!isDecimal) return _copyWith(abs: List.from(_abs)..removeLast());
     if (_dec!.isEmpty) return BigDecimal._(_abs, null, precision);
@@ -184,7 +223,7 @@ class BigDecimal extends Equatable {
     return _copyWith(dec: List.from(_dec!)..removeLast());
   }
 
-  BigDecimal add(int? n) {
+  BigDecimal addValue(int? n) {
     if (n == null) return _addPrecision();
     if (isDecimal) return _addDec(n);
     return _addAbs(n);
