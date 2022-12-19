@@ -60,14 +60,22 @@ void main(List<String> arguments) {
   print('==================================================');
   final x = BigDecimal.parse('1.222', precision: 3);
   final y = BigDecimal.parse('0.2225', precision: 4);
-  final subtract = x - y; // 0.9995 => precision 4
+  final subtract = x - y; // 0.9995 (precision 4)
   final z = BigDecimal.parse('1.888', precision: 4);
-  final addition = x + z; // 3.11 => precision 2
+  final addition = x + z; // 3.11 (precision 2)
+  final multiplication = x * z; // 2.307136 (precision: 6)
+  final division = x / y; // 5.492134831460674 (precision: 15)
 
-  // 1.222 - 0.2225 = 0.9995 => 4
+  // 1.222 - 0.2225 = 0.9995 (precision: 4)
   print('$x - $y = $subtract (precision: ${subtract.precision})');
 
-  // 1.222 + 1.8880 = 3.11 => 2
+  // 1.222 + 1.8880 = 3.11 (precision: 2)
   print('$x + $z = $addition (precision: ${addition.precision})');
+
+  // 1.222 * 1.8880 = 2.307136 (precision: 6)
+  print('$x * $z = $multiplication (precision: ${multiplication.precision})');
+
+  // 1.222 / 0.2225 = 5.492134831460674 (precision: 15)
+  print('$x / $y = $division (precision: ${division.precision})');
   print('==================================================');
 }

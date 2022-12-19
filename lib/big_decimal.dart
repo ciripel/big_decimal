@@ -153,7 +153,7 @@ class BigDecimal extends Equatable {
   /// Example:
   /// ```dart
   /// final x = BigDecimal.parse('1.222', precision: 3);
-  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final y = BigDecimal.parse('1.888', precision: 4);
   /// final addition = x + z; // 3.11 (precision: 2)
   /// ```
   BigDecimal operator +(BigDecimal other) {
@@ -182,15 +182,15 @@ class BigDecimal extends Equatable {
   /// final subtract = x - y; // 0.9995 (precision 4)
   /// ```
   BigDecimal operator -(BigDecimal other) {
+    if (toDecimal() - other.toDecimal() < Decimal.zero) {
+      return BigDecimal.zero(precision: defaultPrecision);
+    }
     final inheritedPrecision = (Decimal.parse(
                     (toDecimal() - other.toDecimal()).toString()) -
                 Decimal.parse(
                     (toDecimal() - other.toDecimal()).truncate().toString()))
             .precision -
         1;
-    if (toDecimal() - other.toDecimal() < Decimal.zero) {
-      return BigDecimal.zero(precision: defaultPrecision);
-    }
     return BigDecimal.parse(
       (toDecimal() - other.toDecimal()).toString(),
       precision: inheritedPrecision,
@@ -198,18 +198,60 @@ class BigDecimal extends Equatable {
   }
 
   /// Multiplication operator.
+  ///
+  /// Precision of the result will be minimum needed precision
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('1.888', precision: 4);
+  /// final multiplication = x * z; // 2.307136 (precision: 6)
+  /// ```
   BigDecimal operator *(BigDecimal other) {
+    final inheritedPrecision = (Decimal.parse(
+                    (toDecimal() * other.toDecimal()).toString()) -
+                Decimal.parse(
+                    (toDecimal() * other.toDecimal()).truncate().toString()))
+            .precision -
+        1;
     return BigDecimal.parse(
       (toDecimal() * other.toDecimal()).toString(),
-      precision: max(precision, other.precision),
+      precision: inheritedPrecision,
     );
   }
 
   /// Division operator.
+  ///
+  /// Matching the similar operator on [double],
+  /// this operation first performs [toDouble] on both this [BigDecimal]
+  /// and [other], then does [double.operator/] on those values and
+  /// returns the result.
+  ///
+  /// **Note:** The initial [toDouble] conversion may lose precision.
+  ///
+  /// It will return [BigDecimal.zero()] if the [other] is [BigDecimal.zero()].
+  ///
+  /// Precision of the result will be minimum needed precision
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final division = x / y; // 5.492134831460674 (precision 15)
+  /// ```
   BigDecimal operator /(BigDecimal other) {
+    if (other.toDecimal() == Decimal.zero) {
+      return BigDecimal.zero(precision: defaultPrecision);
+    }
+    final inheritedPrecision =
+        (Decimal.parse((toDouble() / other.toDouble()).toString()) -
+                    Decimal.parse(
+                        (toDouble() / other.toDouble()).truncate().toString()))
+                .precision -
+            1;
     return BigDecimal.fromDouble(
-      toDecimal().toDouble() / other.toDecimal().toDouble(),
-      precision: precision,
+      toDouble() / other.toDouble(),
+      precision: inheritedPrecision,
     );
   }
 
@@ -256,6 +298,14 @@ class BigDecimal extends Equatable {
 
   Decimal toDecimal() {
     return Decimal.parse(toString());
+  }
+
+  /// Returns this [BigInt] as a [double].
+  ///
+  /// If the number is not representable as a [double],
+  /// an approximation is returned.
+  double toDouble() {
+    return double.parse(toString());
   }
 
   @override

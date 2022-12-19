@@ -88,5 +88,47 @@ void main() {
         '9.01',
       );
     });
+
+    test('multiplication (*)', () {
+      expect(
+        (BigDecimal.parse('1.222', precision: 3) *
+                BigDecimal.parse('1.888', precision: 4))
+            .toString(),
+        '2.307136',
+      );
+      expect(
+        (BigDecimal.parse('1.6', precision: 1) *
+                BigDecimal.parse('1.005', precision: 3))
+            .toString(),
+        '1.608',
+      );
+      expect(
+        (BigDecimal.parse('9.9999', precision: 4) *
+                BigDecimal.parse('0.9899', precision: 4))
+            .toString(),
+        '9.89890101',
+      );
+    });
+
+    test('division (/)', () {
+      expect(
+        (BigDecimal.parse('1.222', precision: 3) /
+                BigDecimal.zero(precision: 4))
+            .toString(),
+        '0',
+      );
+      expect(
+        (BigDecimal.parse('1.6', precision: 1) /
+                BigDecimal.parse('1.005', precision: 3))
+            .toString(),
+        '1.5920398009950252',
+      );
+      expect(
+        (BigDecimal.parse('9.9999', precision: 4) /
+                BigDecimal.parse('0.9899', precision: 4))
+            .toString(),
+        '10.101929487827054',
+      );
+    });
   });
 }
