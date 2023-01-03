@@ -60,22 +60,45 @@ void main(List<String> arguments) {
   print('==================================================');
   final x = BigDecimal.parse('1.222', precision: 3);
   final y = BigDecimal.parse('0.2225', precision: 4);
-  final subtract = x - y; // 0.9995 (precision 4)
   final z = BigDecimal.parse('1.888', precision: 4);
   final addition = x + z; // 3.11 (precision 2)
+  final subtract = x - y; // 0.9995 (precision 4)
   final multiplication = x * z; // 2.307136 (precision: 6)
   final division = x / y; // 5.492134831460674 (precision: 15)
 
-  // 1.222 - 0.2225 = 0.9995 (precision: 4)
-  print('$x - $y = $subtract (precision: ${subtract.precision})');
-
   // 1.222 + 1.8880 = 3.11 (precision: 2)
   print('$x + $z = $addition (precision: ${addition.precision})');
+
+  // 1.222 - 0.2225 = 0.9995 (precision: 4)
+  print('$x - $y = $subtract (precision: ${subtract.precision})');
 
   // 1.222 * 1.8880 = 2.307136 (precision: 6)
   print('$x * $z = $multiplication (precision: ${multiplication.precision})');
 
   // 1.222 / 0.2225 = 5.492134831460674 (precision: 15)
   print('$x / $y = $division (precision: ${division.precision})');
+  print('==================================================');
+  final a = BigDecimal.parse('1.222', precision: 3);
+  final b = BigDecimal.parse('0.2225', precision: 4);
+  final c = BigDecimal.parse('1.888', precision: 4);
+  final add = BigDecimal.add(a, c, precision: 8); // 3.11000000 (precision 8)
+  final sub =
+      BigDecimal.subtract(a, b, precision: 8); // 0.99950000 (precision 8)
+  final multiply =
+      BigDecimal.multiply(a, c, precision: 8); // 2.30713600 (precision: 8)
+  final div =
+      BigDecimal.divide(a, b, precision: 8); // 5.49213483 (precision: 8)
+
+  print(
+      'BigDecimal.add($a, $c, precision: 8) = $add (precision: ${add.precision})');
+
+  print(
+      'BigDecimal.subtract($a, $b, precision: 8) = $sub (precision: ${sub.precision})');
+
+  print(
+      'BigDecimal.multiply($a, $c, precision: 8) = $multiply (precision: ${multiply.precision})');
+
+  print(
+      'BigDecimal.divide($a, $b, precision: 8) = $div (precision: ${div.precision})');
   print('==================================================');
 }

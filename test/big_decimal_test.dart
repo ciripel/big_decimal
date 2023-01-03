@@ -131,4 +131,102 @@ void main() {
       );
     });
   });
+
+  group('BigDecimal operator functions tests -', () {
+    test('add', () {
+      expect(
+        BigDecimal.add(BigDecimal.parse('1.222', precision: 3),
+                BigDecimal.parse('1.888', precision: 4),
+                precision: 8)
+            .toString(),
+        '3.11000000',
+      );
+      expect(
+        BigDecimal.add(BigDecimal.parse('1.6', precision: 1),
+                BigDecimal.parse('1.005', precision: 3),
+                precision: 2)
+            .toString(),
+        '2.61',
+      );
+      expect(
+        BigDecimal.add(BigDecimal.parse('0.0001', precision: 4),
+                BigDecimal.parse('9.9999', precision: 4),
+                precision: 2)
+            .toString(),
+        '10.00',
+      );
+    });
+
+    test('subtract', () {
+      expect(
+        BigDecimal.subtract(BigDecimal.parse('1.222', precision: 3),
+                BigDecimal.parse('1.888', precision: 4),
+                precision: 8)
+            .toString(),
+        '0.00000000',
+      );
+      expect(
+        BigDecimal.subtract(BigDecimal.parse('1.6', precision: 1),
+                BigDecimal.parse('1.005', precision: 3),
+                precision: 2)
+            .toString(),
+        '0.60',
+      );
+      expect(
+        BigDecimal.subtract(BigDecimal.parse('9.9999', precision: 4),
+                BigDecimal.parse('0.9899', precision: 4),
+                precision: 2)
+            .toString(),
+        '9.01',
+      );
+    });
+
+    test('multiply', () {
+      expect(
+        BigDecimal.multiply(BigDecimal.parse('1.222', precision: 3),
+                BigDecimal.parse('1.888', precision: 4),
+                precision: 8)
+            .toString(),
+        '2.30713600',
+      );
+      expect(
+        BigDecimal.multiply(BigDecimal.parse('1.6', precision: 1),
+                BigDecimal.parse('1.005', precision: 3),
+                precision: 2)
+            .toString(),
+        '1.61',
+      );
+      expect(
+        BigDecimal.multiply(BigDecimal.parse('9.9999', precision: 4),
+                BigDecimal.parse('0.9899', precision: 4),
+                precision: 2)
+            .toString(),
+        '9.90',
+      );
+    });
+
+    test('divide', () {
+      expect(
+        BigDecimal.divide(BigDecimal.parse('1.222', precision: 3),
+                BigDecimal.zero(precision: 4),
+                precision: 8)
+            .toString(),
+        '0.00000000',
+      );
+      expect(
+        BigDecimal.divide(BigDecimal.parse('1.6', precision: 1),
+                BigDecimal.parse('1.005', precision: 3),
+                precision: 2)
+            .toString(),
+        '1.59',
+      );
+      expect(
+        BigDecimal.divide(BigDecimal.parse('9.9999', precision: 4),
+                BigDecimal.parse('0.9899', precision: 4),
+                precision: 2)
+            .toString(),
+        '10.10',
+      );
+    });
+  });
 }

@@ -255,6 +255,89 @@ class BigDecimal extends Equatable {
     );
   }
 
+  /// Addition function that uses a specified precision.
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('1.888', precision: 4);
+  /// final addition = BigDecimal.add(x, y, precision: 8); // 3.11000000 (precision 8)
+  /// ```
+  static BigDecimal add(
+    BigDecimal value,
+    BigDecimal other, {
+    int precision = defaultPrecision,
+  }) {
+    return BigDecimal.parse(
+      (value.toDecimal() + other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  /// Subtraction function that uses a specified precision.
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final addition = BigDecimal.subtract(x, y, precision: 8); // 0.99950000 (precision 8)
+  /// ```
+  static BigDecimal subtract(
+    BigDecimal value,
+    BigDecimal other, {
+    int precision = defaultPrecision,
+  }) {
+    if (value.toDecimal() - other.toDecimal() < Decimal.zero) {
+      return BigDecimal.zero(precision: precision);
+    }
+
+    return BigDecimal.parse(
+      (value.toDecimal() - other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  /// Multiplication function that uses a specified precision.
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('1.888', precision: 4);
+  /// final addition = BigDecimal.multiply(x, y, precision: 8); // 2.30713600 (precision 8)
+  /// ```
+  static BigDecimal multiply(
+    BigDecimal value,
+    BigDecimal other, {
+    int precision = defaultPrecision,
+  }) {
+    return BigDecimal.parse(
+      (value.toDecimal() * other.toDecimal()).toString(),
+      precision: precision,
+    );
+  }
+
+  /// Division function that uses a specified precision.
+  ///
+  /// Example:
+  /// ```dart
+  /// final x = BigDecimal.parse('1.222', precision: 3);
+  /// final y = BigDecimal.parse('0.2225', precision: 4);
+  /// final addition = BigDecimal.subtract(x, y, precision: 8); // 5.49213483 (precision 8)
+  /// ```
+  static BigDecimal divide(
+    BigDecimal value,
+    BigDecimal other, {
+    int precision = defaultPrecision,
+  }) {
+    if (other.toDecimal() == Decimal.zero) {
+      return BigDecimal.zero(precision: precision);
+    }
+    return BigDecimal.fromDouble(
+      value.toDouble() / other.toDouble(),
+      precision: precision,
+    );
+  }
+
   BigDecimal clear() => BigDecimal.zero(precision: precision);
 
   BigDecimal removeValue() {
