@@ -125,10 +125,10 @@ void main() {
 
     test('division (/)', () {
       expect(
-        (BigDecimal.parse('1.222', precision: 3) /
-                BigDecimal.zero(precision: 4))
+        (BigDecimal.parse('-1.222', precision: 3) /
+                BigDecimal.parse('0.2225', precision: 4))
             .toString(),
-        '0',
+        '-5.492134831460674',
       );
       expect(
         (BigDecimal.parse('1.6', precision: 1) /
@@ -220,11 +220,11 @@ void main() {
 
     test('divide', () {
       expect(
-        BigDecimal.divide(BigDecimal.parse('1.222', precision: 3),
-                BigDecimal.zero(precision: 4),
+        BigDecimal.divide(BigDecimal.parse('-1.222', precision: 3),
+                BigDecimal.parse('0.2225', precision: 4),
                 precision: 8)
             .toString(),
-        '0.00000000',
+        '-5.49213483',
       );
       expect(
         BigDecimal.divide(BigDecimal.parse('1.6', precision: 1),

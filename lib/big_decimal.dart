@@ -226,8 +226,6 @@ class BigDecimal extends Equatable {
   ///
   /// **Note:** The initial [toDouble] conversion may lose precision.
   ///
-  /// It will return [BigDecimal.zero()] if the [other] is [BigDecimal.zero()].
-  ///
   /// Precision of the result will be minimum needed precision
   ///
   /// Example:
@@ -238,7 +236,7 @@ class BigDecimal extends Equatable {
   /// ```
   BigDecimal operator /(BigDecimal other) {
     if (other.toDecimal() == Decimal.zero) {
-      return BigDecimal.zero(precision: defaultPrecision);
+      throw FormatException('Divisor can\'t be zero');
     }
     final inheritedPrecision =
         (Decimal.parse((toDouble() / other.toDouble()).toString()) -
@@ -318,9 +316,6 @@ class BigDecimal extends Equatable {
   ///
   /// **Note:** The initial [toDouble] conversion may lose precision.
   ///
-  /// It will return [BigDecimal.zero(precision: precision)] if the [other] is
-  /// [BigDecimal.zero()].
-  ///
   /// Example:
   /// ```dart
   /// final x = BigDecimal.parse('1.222', precision: 3);
@@ -333,7 +328,7 @@ class BigDecimal extends Equatable {
     int precision = defaultPrecision,
   }) {
     if (other.toDecimal() == Decimal.zero) {
-      return BigDecimal.zero(precision: precision);
+      throw FormatException('Divisor can\'t be zero');
     }
     return BigDecimal.fromDouble(
       value.toDouble() / other.toDouble(),
