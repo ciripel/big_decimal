@@ -86,7 +86,7 @@ void main() {
         (BigDecimal.parse('1.222', precision: 3) -
                 BigDecimal.parse('1.888', precision: 4))
             .toString(),
-        '0',
+        '-0.666',
       );
       expect(
         (BigDecimal.parse('1.6', precision: 1) -
@@ -176,7 +176,7 @@ void main() {
                 BigDecimal.parse('1.888', precision: 4),
                 precision: 8)
             .toString(),
-        '0.00000000',
+        '-0.66600000',
       );
       expect(
         BigDecimal.subtract(BigDecimal.parse('1.6', precision: 1),

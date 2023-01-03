@@ -28,15 +28,14 @@ class BigDecimal extends Equatable {
     BigInt value, {
     int precision = defaultPrecision,
   }) {
-    if (value < BigInt.zero) {
-      throw FormatException('Only positive values are supported');
-    }
+    final sign = value.isNegative ? '-' : '';
     if (precision < 0) throw FormatException('Precision must be positive');
-    final v = Decimal.fromBigInt(value);
+    final v = Decimal.fromBigInt(value.abs());
     final p = Decimal.fromBigInt(BigInt.from(10).pow(precision));
     final r = (v / p).toDecimal().toString().split('.');
 
     return BigDecimal._(
+      sign,
       r.isNotEmpty ? r.first.split('').map(int.parse).toList() : const [],
       r.length > 1 ? r.last.split('').map(int.parse).toList() : null,
       precision,
@@ -121,13 +120,16 @@ class BigDecimal extends Equatable {
   /// ```
   const BigDecimal.zero({
     int precision = defaultPrecision,
-  }) : this._(const [], null, precision);
+  }) : this._(null, const [], null, precision);
 
   const BigDecimal._(
+    this._sign,
     this._abs,
     this._dec,
     this.precision,
   );
+
+  final String? _sign;
 
   /// must be a valid `int` value. it is list of integers
   final List<int> _abs;
@@ -171,8 +173,6 @@ class BigDecimal extends Equatable {
 
   /// Subtraction operator.
   ///
-  /// It will return [BigDecimal.zero()] if the subtraction result is negative.
-  ///
   /// Precision of the result will be minimum needed precision
   ///
   /// Example:
@@ -182,9 +182,6 @@ class BigDecimal extends Equatable {
   /// final subtract = x - y; // 0.9995 (precision 4)
   /// ```
   BigDecimal operator -(BigDecimal other) {
-    if (toDecimal() - other.toDecimal() < Decimal.zero) {
-      return BigDecimal.zero(precision: defaultPrecision);
-    }
     final inheritedPrecision = (Decimal.parse(
                     (toDecimal() - other.toDecimal()).toString()) -
                 Decimal.parse(
@@ -276,9 +273,6 @@ class BigDecimal extends Equatable {
 
   /// Subtraction function that uses a specified precision.
   ///
-  /// It will return [BigDecimal.zero(precision: precision)] if the subtraction
-  /// result is negative.
-  ///
   /// Example:
   /// ```dart
   /// final x = BigDecimal.parse('1.222', precision: 3);
@@ -290,10 +284,6 @@ class BigDecimal extends Equatable {
     BigDecimal other, {
     int precision = defaultPrecision,
   }) {
-    if (value.toDecimal() - other.toDecimal() < Decimal.zero) {
-      return BigDecimal.zero(precision: precision);
-    }
-
     return BigDecimal.parse(
       (value.toDecimal() - other.toDecimal()).toString(),
       precision: precision,
@@ -356,7 +346,7 @@ class BigDecimal extends Equatable {
   BigDecimal removeValue() {
     if (_abs.isEmpty) return _copyWith();
     if (!isDecimal) return _copyWith(abs: List.from(_abs)..removeLast());
-    if (_dec!.isEmpty) return BigDecimal._(_abs, null, precision);
+    if (_dec!.isEmpty) return BigDecimal._(_sign, _abs, null, precision);
 
     return _copyWith(dec: List.from(_dec!)..removeLast());
   }
@@ -406,9 +396,11 @@ class BigDecimal extends Equatable {
 
   @override
   String toString() {
+    final sign = _sign;
     final abs = _abs.isNotEmpty ? _abs.join('') : '0';
     final dec = _dec?.join('') ?? '0';
-    final str = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
+    final noSign_str = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
+    final str = [sign, noSign_str].join();
 
     return (Decimal.tryParse(str) ?? Decimal.zero)
         .toStringAsFixed(max(precision, defaultPrecision));
@@ -427,10 +419,12 @@ class BigDecimal extends Equatable {
   }
 
   BigDecimal _copyWith({
+    String? sign,
     List<int>? abs,
     List<int>? dec,
   }) {
     return BigDecimal._(
+      sign ?? _sign,
       abs ?? _abs,
       dec ?? _dec,
       precision,
