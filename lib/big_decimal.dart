@@ -276,6 +276,9 @@ class BigDecimal extends Equatable {
 
   /// Subtraction function that uses a specified precision.
   ///
+  /// It will return [BigDecimal.zero(precision: precision)] if the subtraction
+  /// result is negative.
+  ///
   /// Example:
   /// ```dart
   /// final x = BigDecimal.parse('1.222', precision: 3);
@@ -317,6 +320,16 @@ class BigDecimal extends Equatable {
   }
 
   /// Division function that uses a specified precision.
+  ///
+  /// Matching the similar operator on [double],
+  /// this operation first performs [toDouble] on both this [BigDecimal]
+  /// and [other], then does [double.operator/] on those values and
+  /// returns the result.
+  ///
+  /// **Note:** The initial [toDouble] conversion may lose precision.
+  ///
+  /// It will return [BigDecimal.zero(precision: precision)] if the [other] is
+  /// [BigDecimal.zero()].
   ///
   /// Example:
   /// ```dart
