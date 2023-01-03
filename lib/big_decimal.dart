@@ -33,7 +33,7 @@ class BigDecimal extends Equatable {
     }
     if (precision < 0) throw FormatException('Precision must be positive');
     final v = Decimal.fromBigInt(value);
-    final p = Decimal.fromBigInt(BigInt.from(pow(10, precision)));
+    final p = Decimal.fromBigInt(BigInt.from(10).pow(precision));
     final r = (v / p).toDecimal().toString().split('.');
 
     return BigDecimal._(

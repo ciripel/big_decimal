@@ -1,12 +1,15 @@
 import 'package:big_decimal/big_decimal.dart';
-import 'package:decimal/decimal.dart';
 
-void main(List<String> arguments) {
+void main() {
   print(BigDecimal.fromBigInt(BigInt.from(12345))); // 12345
   print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 1)); // 1234.5
   print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 4)); // 1.2345
   print(BigDecimal.fromBigInt(BigInt.from(12345), precision: 8)); // 0.00012345
   print(BigDecimal.fromBigInt(BigInt.from(0), precision: 8)); // 0.00000000
+  print(BigDecimal.fromBigInt(
+      BigInt.parse(
+          '1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'),
+      precision: 90)); // very high precision check
   try {
     print(BigDecimal.fromBigInt(BigInt.from(-12345)));
   } catch (e) {
