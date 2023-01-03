@@ -396,7 +396,7 @@ class BigDecimal extends Equatable {
     return Decimal.parse(toString());
   }
 
-  /// Returns this [BigInt] as a [double].
+  /// Returns this [BigDecimal] as a [double].
   ///
   /// If the number is not representable as a [double],
   /// an approximation is returned.
