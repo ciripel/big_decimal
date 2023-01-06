@@ -219,14 +219,7 @@ class BigDecimal extends Equatable {
 
   /// Division operator.
   ///
-  /// Matching the similar operator on [double],
-  /// this operation first performs [toDouble] on both this [BigDecimal]
-  /// and [other], then does [double.operator/] on those values and
-  /// returns the result.
-  ///
-  /// **Note:** The initial [toDouble] conversion may lose precision.
-  ///
-  /// Precision of the result will be minimum needed precision
+  /// Precision of the result will be the precision of the dividend.
   ///
   /// Example:
   /// ```dart
@@ -238,16 +231,7 @@ class BigDecimal extends Equatable {
     if (other.toDecimal() == Decimal.zero) {
       throw FormatException('Divisor can\'t be zero');
     }
-    final inheritedPrecision =
-        (Decimal.parse((toDouble() / other.toDouble()).toString()) -
-                    Decimal.parse(
-                        (toDouble() / other.toDouble()).truncate().toString()))
-                .precision -
-            1;
-    return BigDecimal.fromDouble(
-      toDouble() / other.toDouble(),
-      precision: inheritedPrecision,
-    );
+    return divide(this, other, precision: precision);
   }
 
   /// Addition function that uses a specified precision.
@@ -309,13 +293,6 @@ class BigDecimal extends Equatable {
 
   /// Division function that uses a specified precision.
   ///
-  /// Matching the similar operator on [double],
-  /// this operation first performs [toDouble] on both this [BigDecimal]
-  /// and [other], then does [double.operator/] on those values and
-  /// returns the result.
-  ///
-  /// **Note:** The initial [toDouble] conversion may lose precision.
-  ///
   /// Example:
   /// ```dart
   /// final x = BigDecimal.parse('1.222', precision: 3);
@@ -330,10 +307,53 @@ class BigDecimal extends Equatable {
     if (other.toDecimal() == Decimal.zero) {
       throw FormatException('Divisor can\'t be zero');
     }
-    return BigDecimal.fromDouble(
-      value.toDouble() / other.toDouble(),
-      precision: precision,
-    );
+
+    if (precision + other.precision > value.precision) {
+      final newPrecision = precision + other.precision;
+      final raise = newPrecision - value.precision;
+      final scaledValue = value.toBigInt() * BigInt.from(10).pow(raise);
+      return _divide(scaledValue, other.toBigInt(), precision: precision);
+    } else {
+      final newPrecision = value.precision - precision;
+      final raise = newPrecision - other.precision;
+      final scaledOther = other.toBigInt() * BigInt.from(10).pow(raise);
+      return _divide(value.toBigInt(), scaledOther, precision: precision);
+    }
+  }
+
+  static BigDecimal _divide(
+    BigInt value,
+    BigInt other, {
+    int precision = defaultPrecision,
+  }) {
+    final quotient = value ~/ other;
+    final remainder = value.remainder(other).abs();
+    if (remainder != BigInt.zero) {
+      if (_needIncrement(remainder, other, quotient)) {
+        return BigDecimal.fromBigInt(
+            quotient + (value.sign == other.sign ? BigInt.one : -BigInt.one),
+            precision: precision);
+      }
+      return BigDecimal.fromBigInt(quotient, precision: precision);
+    } else {
+      return BigDecimal.fromBigInt(quotient, precision: precision);
+    }
+  }
+
+  static bool _needIncrement(
+    BigInt remainder,
+    BigInt divisor,
+    BigInt quotient,
+  ) {
+    final remainderComparisonToHalfDivisor =
+        (remainder * BigInt.from(2)).compareTo(divisor);
+    if (remainderComparisonToHalfDivisor < 0) {
+      return false;
+    } else if (remainderComparisonToHalfDivisor > 0) {
+      return true;
+    } else {
+      return quotient.isOdd;
+    }
   }
 
   BigDecimal clear() => BigDecimal.zero(precision: precision);

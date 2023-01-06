@@ -128,19 +128,19 @@ void main() {
         (BigDecimal.parse('-1.222', precision: 3) /
                 BigDecimal.parse('0.2225', precision: 4))
             .toString(),
-        '-5.492134831460674',
+        '-5.492',
       );
       expect(
         (BigDecimal.parse('1.6', precision: 1) /
                 BigDecimal.parse('1.005', precision: 3))
             .toString(),
-        '1.5920398009950252',
+        '1.6',
       );
       expect(
         (BigDecimal.parse('9.9999', precision: 4) /
                 BigDecimal.parse('0.9899', precision: 4))
             .toString(),
-        '10.101929487827054',
+        '10.1019',
       );
     });
   });
@@ -236,9 +236,9 @@ void main() {
       expect(
         BigDecimal.divide(BigDecimal.parse('9.9999', precision: 4),
                 BigDecimal.parse('0.9899', precision: 4),
-                precision: 2)
+                precision: 19)
             .toString(),
-        '10.10',
+        '10.1019294878270532377',
       );
     });
   });

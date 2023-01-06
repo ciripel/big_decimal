@@ -59,7 +59,7 @@ void main() {
   final addition = x + z; // 3.11 (precision 2)
   final subtract = x - y; // 0.9995 (precision 4)
   final multiplication = x * z; // 2.307136 (precision: 6)
-  final division = x / y; // 5.492134831460674 (precision: 15)
+  final division = x / y; // 5.492(precision: 3)
 
   // 1.222 + 1.8880 = 3.11 (precision: 2)
   print('$x + $z = $addition (precision: ${addition.precision})');
@@ -84,8 +84,8 @@ void main() {
       BigDecimal.subtract(x, y, precision: 8); // 0.99950000 (precision 8)
   final multiply =
       BigDecimal.multiply(x, z, precision: 8); // 2.30713600 (precision: 8)
-  final div =
-      BigDecimal.divide(x, y, precision: 8); // 5.49213483 (precision: 8)
+  final div = BigDecimal.divide(x, y,
+      precision: 19); // 5.4921348314606741573 (precision: 19)
 
   print(
       'BigDecimal.add($x, $z, precision: 8) = $add (precision: ${add.precision})');
@@ -97,7 +97,7 @@ void main() {
       'BigDecimal.multiply($x, $z, precision: 8) = $multiply (precision: ${multiply.precision})');
 
   print(
-      'BigDecimal.divide($x, $y, precision: 8) = $div (precision: ${div.precision})');
+      'BigDecimal.divide($x, $y, precision: ${div.precision}) = $div (precision: ${div.precision})');
 
   try {
     print(BigDecimal.divide(x, zero));
