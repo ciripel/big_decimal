@@ -394,8 +394,8 @@ class BigDecimal extends Equatable {
     final sign = _sign;
     final abs = _abs.isNotEmpty ? _abs.join('') : '0';
     final dec = _dec?.join('') ?? '0';
-    final noSign_str = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
-    final str = [sign, noSign_str].join();
+    final noSignStr = [abs, dec].join('.').replaceAll(RegExp(r'[.]*$'), '');
+    final str = [sign, noSignStr].join();
 
     return (Decimal.tryParse(str) ?? Decimal.zero)
         .toStringAsFixed(max(precision, defaultPrecision));
